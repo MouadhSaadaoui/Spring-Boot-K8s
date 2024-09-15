@@ -1,0 +1,33 @@
+steps:
+  # Step 1: Set up Maven to package your Spring Boot app
+  - name: 'maven:3.8-jdk-11'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        mvn clean package
+
+  # Step 2: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'gcr.io/$PROJECT_ID/my-Kote-app:$TAG_NAME',
+        '.'
+      ]
+
+  # Step 3: Push the Docker image to GCR
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'push',
+        'gcr.io/$PROJECT_ID/my-Knote-app:$TAG_NAME'
+      ]
+
+# Optional: Set environment variables
+substitutions:
+  _TAG_NAME: "latest"  # Or pass this during build time
+
+images:
+  - 'gcr.io/$PROJECT_ID/my-app:$TAG_NAME'
